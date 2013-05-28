@@ -18,7 +18,7 @@ As the author said:
 
 Blitz(til v0.8.6) does not support PHP-like "for" or "foreach" loop statement for design's sake, but you can still use PHP code to make loop things, like this:
 
-`$View = new Blitz();
+<pre class="line-pre">$View = new Blitz();
 $View->load('hello {{ BEGIN block }} {{ $name }} {{ END }}');
 $T->display(
     array('block' => array(
@@ -26,6 +26,6 @@ $T->display(
         array('name' => 'Donny'),
         array('name' => 'Sobchak'),
     ))
-);`
+);</pre>
 
 As shown above, `BLOCK` aka `BEGIN` statement in Blitz actually iterates an Array's elements and assigns them into the template, but to achieve this situation you'll have to format the input var into a nested array, that might be much clear for complex inputs, but looks horrible if we just wana to render a simple list like `'name' => array('Dude', 'Donny', 'Doggy')`, so i mix this little feature into the original Blitz projects
