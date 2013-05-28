@@ -18,9 +18,9 @@ As the author said:
 
 Blitz(til v0.8.6) does not support PHP-like "for" or "foreach" loop statement for design's sake, but you can still use PHP code to make loop things, like this:
 
-<pre class="line-pre">$View = new Blitz();
+<pre class="line-pre lines highlight">$View = new Blitz();
 $View->load('hello {{ BEGIN block }} {{ $name }} {{ END }}');
-$T->display(
+$View->display(
     array('block' => array(
         array('name' => 'Dude'),
         array('name' => 'Donny'),
