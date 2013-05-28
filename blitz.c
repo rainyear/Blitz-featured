@@ -3017,6 +3017,7 @@ static void blitz_exec_context(blitz_tpl *tpl, blitz_node *node, zval *parent_pa
                 }
                 /* mix of num/str errors: array(0=>array(), 'key' => 'val') */
                 if (IS_ARRAY != Z_TYPE_PP(ctx_data)) {
+                    /*
                     blitz_error(tpl TSRMLS_CC, E_WARNING,
                         "ERROR: You have a mix of numerical and non-numerical keys in the iteration set "
                         "(context: %s, line %lu, pos %lu), key was ignored",
@@ -3024,6 +3025,25 @@ static void blitz_exec_context(blitz_tpl *tpl, blitz_node *node, zval *parent_pa
                         get_line_number(tpl->static_data.body, node->pos_begin),
                         get_line_pos(tpl->static_data.body, node->pos_begin)
                     );
+                    */
+
+                    //FOREACH of simple list feature here
+                    zval *ctx_data_v_arr;//change ctx_data = "a" to ctx_data_v_arr = array("_v"=>"a")
+                    MAKE_STD_ZVAL(ctx_data_v_arr);
+                    array_init(ctx_data_v_arr);
+
+                    if(IS_STRING == Z_TYPE_PP(ctx_data)){
+                        add_assoc_stringl(ctx_data_v_arr, "_v", Z_STRVAL_PP(ctx_data), Z_STRLEN_PP(ctx_data), 0);
+                    }else if(IS_LONG == Z_TYPE_PP(ctx_data)){
+                        add_assoc_long(ctx_data_v_arr, "_v", Z_LVAL_PP(ctx_data));
+                    }
+
+                    blitz_exec_nodes(tpl, node->first_child, id, result, result_len, result_alloc_len, 
+                        node->pos_begin_shift, node->pos_end_shift,
+                        ctx_data_v_arr TSRMLS_CC);
+                    BLITZ_LOOP_INCREMENT(tpl);
+                    //Alter done here
+
                     zend_hash_move_forward_ex(Z_ARRVAL_PP(ctx_iterations), NULL);
                     continue;
                 }
