@@ -28,4 +28,4 @@ $View->display(
     ))
 );</pre>
 
-As shown above, `BLOCK` aka `BEGIN` statement in Blitz actually iterates an Array's elements and assigns them into the template, but to achieve this situation you'll have to format the input var into a nested array, that might be much clear for complex inputs, but also looks horrible if we just wana to render a simple list like `'name' => array('Dude', 'Donny', 'Doggy')`, so i mix this little feature into the original Blitz projects
+As shown above, `BLOCK` aka `BEGIN` statement in Blitz actually iterates an Array's elements and assigns them into the template, but to achieve this situation you'll have to format the input var into a nested array, that might be much clear for complex inputs, but also looks horrible if we just wana to render a simple list like `'name' => array('Dude', 'Donny', 'Doggy')`, so i mix this little feature into the original Blitz projects.
