@@ -156,13 +156,30 @@ ZEND_END_MODULE_GLOBALS(blitz)
 #define BLITZ_NODE_TYPE_PREDEF_MASK		28
 #define BLITZ_IS_PREDEF_METHOD(type)	(type & BLITZ_NODE_TYPE_PREDEF_MASK)
 
+/*
 #define BLITZ_STRING_IS_BEGIN(s, len)                                                       \
     ((5 == len) &&                                                                          \
         (('B' == s[0] && 'E' == s[1] && 'G' == s[2] && 'I' == s[3] && 'N' == s[4])          \
         ||                                                                                  \
         ('b' == s[0] && 'e' == s[1] && 'g' == s[2] && 'i' == s[3] && 'n' == s[4]))          \
     )
-    
+*/
+#define BLITZ_STRING_IS_BEGIN(s, len)                                                               \
+    (                                                                                               \
+        (                                                                                           \
+            (5 == len) &&                                                                           \
+            (                                                                                       \
+                ('B' == s[0] && 'E' == s[1] && 'G' == s[2] && 'I' == s[3] && 'N' == s[4])           \
+                ||                                                                                  \
+                ('b' == s[0] && 'e' == s[1] && 'g' == s[2] && 'i' == s[3] && 'n' == s[4])           \
+            )                                                                                       \
+        ) || ((7 == len) && \
+        (('F' == s[0] && 'O' == s[1] && 'R' == s[2] && 'E' == s[3] && 'A' == s[4] && 'C' == s[5] && 'H' == s[6]) \
+        || \
+        ('f' == s[0] && 'o' == s[1] && 'r' == s[2] && 'e' == s[3] && 'a' == s[4] && 'c' == s[5] && 'h' == s[6])) \
+        ) \
+    )    
+
 #define BLITZ_STRING_IS_END(s, len)                                                         \
     ((3 == len) &&                                                                          \
         (('E' == s[0] && 'N' == s[1] && 'D' == s[2])                                        \
