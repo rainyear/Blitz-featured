@@ -1,0 +1,15 @@
+<html>
+  <head>
+    <title>Smarty</title>
+  </head>
+  <body>
+  <h1>Hello, {{$name}}!</h1>
+  <hr/>
+  <p>Name List</p>
+  <ul>
+	{{FOREACH list}}
+	<li>{{$_k}}: {{$_v}}</li>
+	{{end}}
+  </ul>
+  </body>
+</html>
