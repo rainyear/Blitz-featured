@@ -1,20 +1,19 @@
-===================================================================================================
 Installing blitz
-===================================================================================================
-tar zxvf blitz.tar.gz
-cd blitz
+======
+<pre>
 phpize
 ./configure
 make
 make install
+</pre>
 
-===================================================================================================
+----
 
 Blitz is a [fast and powerfull template engine for very big internet projects](http://alexeyrybak.com/blitz/blitz_en.html)
 
 As the author said:
 
-> The reason why Blitz objects are called "**template controllers**" is simple. From the very early days template language in Blitz was designed to be as simple ("non-programming") as possible. For example, there is still no "for" or "foreach" statement in Blitz. This surely doesn't mean you can't do any looping :) But you have to loop from your PHP-code, this is called "passive" templates (in Blitz you can do a lot of "active" templating as well - conditions, callbacks, plugins - but loops like "foreach", complex expressions, all these "programming" statements are still under the law). 
+> The reason why Blitz objects are called "template controllers" is simple. From the very early days template language in Blitz was designed to be as simple ("non-programming") as possible. For example, there is still no "for" or "foreach" statement in Blitz. This surely doesn't mean you can't do any looping :) But you have to loop from your PHP-code, this is called "passive" templates (in Blitz you can do a lot of "active" templating as well - conditions, callbacks, plugins - but loops like "foreach", complex expressions, all these "programming" statements are still under the law). 
 
 Blitz(til v0.8.6) does not support PHP-like "for" or "foreach" loop statement for design's sake, but you can still use PHP code to make loop things, like this:
 
