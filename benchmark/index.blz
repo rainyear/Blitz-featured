@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Smarty</title>
+    <title>Blitz</title>
   </head>
   <body>
   <h1>Hello, {{$name}}!</h1>
