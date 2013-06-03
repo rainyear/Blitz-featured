@@ -3026,7 +3026,6 @@ static void blitz_exec_context(blitz_tpl *tpl, blitz_node *node, zval *parent_pa
                         get_line_pos(tpl->static_data.body, node->pos_begin)
                     );
                     */
-
                     //FOREACH of simple list feature here
                     zval *ctx_data_v_arr;//change ctx_data = "a" to ctx_data_v_arr = array("_v"=>"a")
                     MAKE_STD_ZVAL(ctx_data_v_arr);
@@ -3298,6 +3297,8 @@ static inline void blitz_check_expr (
                     case BLITZ_EXPR_OPERATOR_GE: *is_true = (d1 >= d2) ? 1 : 0; break; 
                     case BLITZ_EXPR_OPERATOR_L:  *is_true = (d1 <  d2) ? 1 : 0; break; 
                     case BLITZ_EXPR_OPERATOR_LE: *is_true = (d1 <= d2) ? 1 : 0; break;
+                    case BLITZ_EXPR_OPERATOR_LO: *is_true = (d1 || d2) ? 1 : 0; break;
+                    case BLITZ_EXPR_OPERATOR_LA: *is_true = (d1 && d2) ? 1 : 0; break;
                     default: *is_true = 0; 
                 }
             }
