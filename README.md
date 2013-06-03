@@ -57,5 +57,5 @@ Usage:
         $t->display(array("a"=>3, "zc"=>2, "b"=>0));
     ?>
     </pre>
-    \**can only parse logic check arguments by order, do not support Parentheses*
+    *can only parse logic check arguments by order, do not support Parentheses*
     
