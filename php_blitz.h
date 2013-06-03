@@ -734,7 +734,9 @@ typedef struct _blitz_analizer_ctx {
         value = -1;                                                                                                    \
     } else {                                                                                                           \
         unsigned int current = tpl->loop_stack[tpl->loop_stack_level].current;                                         \
-        if (len == 5 && n[1] == 'e' && n[2] == 'v' && n[3] == 'e' && n[4] == 'n') {                                    \
+        if (len == 2 && n[1] == 'k'){\
+            value = current; \
+        } else if (len == 5 && n[1] == 'e' && n[2] == 'v' && n[3] == 'e' && n[4] == 'n') {                                    \
             value = !(current%2);                                                                                      \
         } else if (len == 4 && n[1] == 'o' && n[2] == 'd' && n[3] == 'd') {                                            \
             value = current%2;                                                                                         \
@@ -742,7 +744,7 @@ typedef struct _blitz_analizer_ctx {
             value = (0 == current);                                                                                    \
         } else if (len == 5 && n[1] == 'l' && n[2] == 'a' && n[3] == 's' && n[4] == 't') {                             \
             value = (current+1 == tpl->loop_stack[tpl->loop_stack_level].total);                                       \
-        } else if ((len == 4 && n[1] == 'n' && n[2] == 'u' && n[3] == 'm') || (len == 2 && n[1] == 'k')){                                            \
+        } else if (len == 4 && n[1] == 'n' && n[2] == 'u' && n[3] == 'm'){                                            \
             value = current + 1;                                                                                       \
         } else if (len == 6 && n[1] == 't' && n[2] == 'o' && n[3] == 't' && n[4] == 'a' && n[5] == 'l') {              \
             value = tpl->loop_stack[tpl->loop_stack_level].total;                                                      \
