@@ -17,6 +17,7 @@
 */
 
 #define BLITZ_DEBUG 0 
+#define RAINY_DEBUG 0
 #define BLITZ_VERSION_STRING "0.8.6"
 
 #ifndef PHP_WIN32
@@ -1032,8 +1033,6 @@ static inline void blitz_parse_arg (char *text, char var_prefix,
     i_len = i_pos = ok = 0;
     p = token_out;
 
-    if (BLITZ_DEBUG) php_printf("[F] blitz_parse_arg: %u\n", *c);
-
     if (var_prefix && (symb == var_prefix)) {
         ++c; ++pos;
         is_path = 0;
@@ -1281,6 +1280,18 @@ static inline void blitz_parse_call (char *text, unsigned int len_text, blitz_no
                     state = BLITZ_CALL_STATE_FINISHED;
                     break;
                case BLITZ_CALL_STATE_IF:
+
+               //my debug 0
+               //checkout what do they mean?
+               /*
+               php_printf("tag_len: %d\n", len_text);
+               php_printf("c: <%s>\n", c);
+               php_printf("i_pos: %d\n", i_pos);
+               php_printf("pos: %d\n", pos);
+               php_printf("text: <%s>\n", text);
+               */
+               /*original version*/
+               /*
                     BLITZ_SKIP_BLANK(c,i_pos,pos);
                     is_path = i_len = i_pos = i_type = ok = 0;
                     blitz_parse_arg(c, var_prefix, buf, &i_type, &i_len, &i_pos TSRMLS_CC);
@@ -1316,6 +1327,49 @@ static inline void blitz_parse_call (char *text, unsigned int len_text, blitz_no
                     } else {
                         state = BLITZ_CALL_STATE_ERROR;
                     }
+                */
+                /*done*/
+                /*while loop all args - rainy version*/
+                    /* what do they mean?
+                     * c, i_pos, pos, is_path, ok, i_len, text, pos
+                     * c = IF后第一个字符串开头的到body最后的字符串（包括空格）；
+                     * i_pos 用于记录当前位置的变量，使用前被初始化为0；
+                     * pos = IF 在当前标签"<!--{ ..."中的位置；
+                     * i_len = arg的长度；
+                     * text = 从开标签"<!--{"之后的字符串(包括空格)；
+                     */
+                    BLITZ_SKIP_BLANK(c,i_pos,pos);
+                    char odd = 1;
+                    while(pos < len_text){
+                        is_path = i_len = i_pos = i_type = ok = 0;
+                        if(odd){
+                            blitz_parse_arg(c, var_prefix, buf, &i_type, &i_len, &i_pos TSRMLS_CC);
+                            if(!i_pos){
+                                state = BLITZ_CALL_STATE_ERROR;
+                                break;
+                            }
+                            ok = 1;
+                            pos += i_pos;
+                            c = text + pos;
+                            ADD_CALL_ARGS(buf, i_len, i_type);
+                            --odd;
+                        }else{
+                            BLITZ_SCAN_EXPR_OPERATOR(c,i_len,i_type);
+                            if(!i_len){
+                                state = BLITZ_CALL_STATE_ERROR;
+                                break;
+                            }
+                            ok = 0;
+                            c += i_len; pos += i_len;
+                            ADD_CALL_ARGS(NULL, 0, i_type);
+                            ++odd;
+                        }
+                        BLITZ_SKIP_BLANK(c,i_pos,pos);
+                        if(RAINY_DEBUG)php_printf("NOW POS: %d, len_text: %d\n", pos, len_text);
+                     }
+                     state = BLITZ_CALL_STATE_FINISHED;
+                /*done*/
+
                     break;
                 case BLITZ_CALL_STATE_ELSE:
                     i_pos = 0;
@@ -3107,7 +3161,8 @@ static inline unsigned int blitz_extract_var (
 /* {{{ int blitz_check_arg() */
 static inline void blitz_check_arg (
     blitz_tpl *tpl,
-    blitz_node *node,
+    //blitz_node *node,
+    call_arg *args,
     zval *parent_params,
     int *not_empty TSRMLS_DC)
 {
@@ -3115,7 +3170,10 @@ static inline void blitz_check_arg (
     call_arg *arg = NULL;
     zval **z = NULL;
 
-    arg = node->args;
+    /*original version*/
+    //arg = node->args;
+    /*using call_arg *args instead of node - rainy*/
+    arg = args;
     BLITZ_GET_PREDEFINED_VAR(tpl, arg->name, arg->len, predefined);
     if (predefined > 0) {
         *not_empty = 1;
@@ -3200,9 +3258,10 @@ static inline void blitz_check_arg (
 /* {{{ int blitz_check_expr() */
 static inline void blitz_check_expr (
     blitz_tpl *tpl,
-    blitz_node *node,
+    //blitz_node *node,
+    call_arg *args,
     zval *parent_params,
-    int *is_true TSRMLS_DC)
+    char *is_true TSRMLS_DC)
 {
     long predefined = -1, cmp = 0;
     unsigned long i = 0;
@@ -3215,9 +3274,17 @@ static inline void blitz_check_expr (
     long l1 = 0, l2 = 0;
     double d1 = 0.0, d2 = 0.0;
  
+    /*original version*/
+    /*
     expr_arg = &node->args[1];
     a[0] = &node->args[0];
     a[1] = &node->args[2];
+    */
+    /*using call_arg *args instead of blitz_node *node - rainy*/
+    expr_arg = &args[1];
+    a[0] = &args[0];
+    a[1] = &args[2];
+
 
     if (BLITZ_DEBUG)
         php_printf("*** FUNCTION *** blitz_check_expr\n");
@@ -3318,7 +3385,8 @@ static void blitz_exec_if_context(
     unsigned long *result_alloc_len,
     unsigned long *jump TSRMLS_DC)
 {
-    int condition = 0, is_true = 0;
+    int condition = 0;
+    char is_true = 0;
     blitz_node *node = NULL;
     unsigned int i = 0, i_jump = 0, n_nodes = 0, pos_end = 0;
 
@@ -3338,12 +3406,39 @@ static void blitz_exec_if_context(
             condition = 1;
         } else { 
 
-            if (node->n_args == 3) {
-                blitz_check_expr(tpl, node, parent_params, &is_true TSRMLS_CC);
-            } else {
-                blitz_check_arg(tpl, node, parent_params, &is_true TSRMLS_CC);
-            }
+            if(RAINY_DEBUG)
+                php_printf("n_args: %d\n", node->n_args);
 
+            /*rainy featured*/
+            if (node->n_args == 1) {
+                blitz_check_arg(tpl, node->args, parent_params, &is_true TSRMLS_CC);
+            } else if(node->n_args == 3){
+                blitz_check_expr(tpl, node->args, parent_params, &is_true TSRMLS_CC);
+            } else{
+                //More than 3 args
+                char i_arg = 0, ii_arg = 0;
+                char last_is_true = 0;
+                call_arg tmp_args[3] = {{"0", 1, BLITZ_ARG_TYPE_NUM},
+                            {NULL, 0, BLITZ_EXPR_OPERATOR_LO},
+                            {"0", 1, BLITZ_ARG_TYPE_NUM}};
+                for(;i_arg <= node->n_args;i_arg++){
+                    if(node->args[i_arg].type == BLITZ_EXPR_OPERATOR_LA || node->args[i_arg].type == BLITZ_EXPR_OPERATOR_LO || i_arg == node->n_args){
+                        if(ii_arg == 1){
+                            blitz_check_arg(tpl, &(node->args[i_arg - ii_arg]), parent_params, &last_is_true TSRMLS_CC);
+                        }else if(ii_arg == 3){
+                            blitz_check_expr(tpl, &(node->args[i_arg - ii_arg]), parent_params, &last_is_true TSRMLS_CC);
+                        }
+                        tmp_args[2].name = last_is_true ? "1" : "0";//num -> char
+                        blitz_check_expr(tpl, tmp_args, parent_params, &is_true TSRMLS_CC);
+                        tmp_args[1].type = node->args[i_arg].type;
+                        tmp_args[0].name = is_true ? "1" : "0";//num -> char
+                        ii_arg = 0;
+                    }else{
+                        ii_arg++;
+                    }
+                }
+            }
+            /*done*/
             if (node->type == BLITZ_NODE_TYPE_UNLESS_CONTEXT) {
                 condition = is_true ? 0 : 1;
             } else {
